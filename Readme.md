@@ -1,12 +1,12 @@
 # Distributed KV Store
 
-# Concept
+## Concept
 Multiple kv server, communicating with each other, when a server store gets updated, other store for servers also gets updated. (Replication)
 If a server stops, it will be replaced by other server.
 
-# Todo
+## Todo
 1. Protocol Design
-  - Binary Protocol
+    - Binary Protocol
 
 2. Parser
 
