@@ -54,9 +54,9 @@ func Init(hosts []string) Nodes {
 	online := make(map[string]struct{})
 
 	rm.DoWithCtx(ctx, func() bool {
-		body := make(map[string]any)
 		for _, n := range hosts {
 			var (
+				body          = make(map[string]any)
 				err           error
 				clientErr     string
 				clientNode    string
@@ -70,19 +70,19 @@ func Init(hosts []string) Nodes {
 				continue
 			}
 			c := fiber.AcquireClient()
+			defer fiber.ReleaseClient(c)
 
 			url := n + "/endpoint"
 			a := c.Get(url)
+			defer fiber.ReleaseAgent(a)
+
 			code, b, errs := a.Bytes()
-			if len(errs) > 0 || code != fiber.StatusFound {
+			if len(errs) > 0 {
 				for _, e := range errs {
 					fmt.Println(code, e)
 				}
 				goto END
 			}
-
-			fiber.ReleaseAgent(a)
-			fiber.ReleaseClient(c)
 
 			if err := json.Unmarshal(b, &body); err != nil {
 				fmt.Println("Marshal error:", err)
