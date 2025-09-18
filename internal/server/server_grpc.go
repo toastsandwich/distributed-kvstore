@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/toastsandwich/kvstore/pkg/kvstore"
 	"github.com/toastsandwich/kvstore/pkg/proto"
+	"google.golang.org/grpc/codes"
 )
 
 type grpcServer struct {
@@ -16,7 +16,7 @@ type grpcServer struct {
 }
 
 func (g *grpcServer) Ping(ctx context.Context, req *proto.PingRequest) (*proto.Response, error) {
-	return &proto.Response{Message: "pong", Code: 200}, nil
+	return &proto.Response{Message: "pong", Code: int32(codes.OK)}, nil
 }
 
 func (g *grpcServer) Put(ctx context.Context, req *proto.PutRequest) (*proto.Response, error) {
@@ -26,7 +26,7 @@ func (g *grpcServer) Put(ctx context.Context, req *proto.PutRequest) (*proto.Res
 		return nil, ctx.Err()
 	default:
 		for _, p := range req.Pairs {
-			if err := g.s.Add(p.Key, p.Val); err != nil {
+			if err := g.s.Add(p.Key, p.Val, false); err != nil {
 				errs = append(errs, err.Error())
 			}
 		}
@@ -34,10 +34,32 @@ func (g *grpcServer) Put(ctx context.Context, req *proto.PutRequest) (*proto.Res
 			errors := strings.Join(errs, ",")
 			return &proto.Response{
 				Message: errors,
-				Code:    fiber.StatusInternalServerError,
+				Code:    int32(codes.Unknown),
 			}, fmt.Errorf("error while PUT: %s", errors)
 		}
-		return &proto.Response{Message: "Created", Code: fiber.StatusCreated}, nil
+		return &proto.Response{Message: "Created", Code: int32(codes.OK)}, nil
+	}
+}
+
+func (g *grpcServer) Update(ctx context.Context, req *proto.PutRequest) (*proto.Response, error) {
+	errs := make([]string, 0)
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		for _, p := range req.Pairs {
+			if err := g.s.Update(p.Key, p.Val, false); err != nil {
+				errs = append(errs, err.Error())
+			}
+		}
+		if len(errs) > 0 {
+			errors := strings.Join(errs, ",")
+			return &proto.Response{
+				Message: errors,
+				Code:    int32(codes.Unknown),
+			}, fmt.Errorf("error while PUT: %s", errors)
+		}
+		return &proto.Response{Message: "Created", Code: int32(codes.OK)}, nil
 	}
 }
 
@@ -48,7 +70,7 @@ func (g *grpcServer) Delete(ctx context.Context, req *proto.DeleteRequest) (*pro
 		return nil, ctx.Err()
 	default:
 		for _, k := range req.Keys {
-			if err := g.s.Remove(k); err != nil {
+			if err := g.s.Remove(k, false); err != nil {
 				errs = append(errs, err.Error())
 			}
 		}
@@ -56,9 +78,9 @@ func (g *grpcServer) Delete(ctx context.Context, req *proto.DeleteRequest) (*pro
 			errors := strings.Join(errs, ",")
 			return &proto.Response{
 				Message: errors,
-				Code:    fiber.StatusInternalServerError,
+				Code:    int32(codes.Unknown),
 			}, fmt.Errorf("error while DELETE: %s", errors)
 		}
-		return &proto.Response{Message: "Deleted", Code: fiber.StatusOK}, nil
+		return &proto.Response{Message: "Deleted", Code: int32(codes.OK)}, nil
 	}
 }

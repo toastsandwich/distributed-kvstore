@@ -34,7 +34,7 @@ func (h *Handler) PutHandler(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	if err := h.s.Add(reqBody.Key, reqBody.Value); err != nil {
+	if err := h.s.Add(reqBody.Key, reqBody.Value, true); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
@@ -47,7 +47,7 @@ func (h *Handler) UpdateHandler(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	if err := h.s.Update(reqBody.Key, reqBody.Value); err != nil {
+	if err := h.s.Update(reqBody.Key, reqBody.Value, true); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
@@ -59,7 +59,7 @@ func (h *Handler) RemoveHandler(ctx *fiber.Ctx) error {
 	if err := parseRequest(ctx, reqBody); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	if err := h.s.Remove(reqBody.Key); err != nil {
+	if err := h.s.Remove(reqBody.Key, true); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
