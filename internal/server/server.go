@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/toastsandwich/kvstore/internal/bootstrap"
 	"github.com/toastsandwich/kvstore/internal/config"
@@ -41,12 +40,9 @@ func New(cfg config.Config) *Server {
 }
 
 func (s *Server) Start() {
-	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	parentCtx = context.Background()
 
 	initKVStore()
-
-	app := initHTTPServer(s.cfg.Name)
 
 	port, err := s.findFreePort()
 	if err != nil {
@@ -55,13 +51,15 @@ func (s *Server) Start() {
 	}
 
 	grpcHost = net.JoinHostPort(s.cfg.Host.Addr, fmt.Sprint(port))
-	grpc := initGRPCServer()
 
-	s.wg.Add(1)
-	go s.startHTTPServer(app)
+	grpc := initGRPCServer()
+	app := initHTTPServer(s.cfg.Name)
 
 	s.wg.Add(1)
 	go s.startGRPCServer(grpc)
+
+	s.wg.Add(1)
+	go s.startHTTPServer(app)
 
 	nodes := bootstrap.Init(s.cfg.Peer)
 	defer bootstrap.Close()

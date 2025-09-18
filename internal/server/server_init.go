@@ -15,65 +15,90 @@ import (
 )
 
 var (
-	ctx    context.Context
-	cancel context.CancelFunc
+	parentCtx context.Context
 
 	store *kvstore.Store
-
-	addEvent kvstore.EventTrigger
-	delEvent kvstore.EventTrigger
 )
 
 func initKVStore() {
-	store = kvstore.New(ctx)
-	kvstore.AddEvent = addEvent
-	kvstore.UpdateEvent = addEvent
-	kvstore.RemoveEvent = delEvent
+	store = kvstore.New()
 }
 
 func registerEvents(nodes bootstrap.Nodes) error {
 	if nodes == nil {
 		return fmt.Errorf("nodes cannot be nill")
 	}
-	addEvent = func(ctx context.Context, s string, a any) error {
+
+	kvstore.AddEvent = func(s string, a any) error {
 		wg := &sync.WaitGroup{}
 		for _, n := range nodes {
 			wg.Add(1)
-			go func(wg *sync.WaitGroup) {
+			go func(n proto.ServiceKVStoreClient) {
 				defer wg.Done()
+
+				ctx, cancel := context.WithTimeout(parentCtx, 2*time.Second)
+				defer cancel()
 
 				req := &proto.PutRequest{
 					Pairs: []*proto.KVPair{{Key: s, Val: fmt.Sprint(a)}},
 				}
 				resp, err := n.Put(ctx, req)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println("add event error", err)
 					return
 				}
 				fmt.Printf("AddEvent: Code:%d Message:%s\n", resp.GetCode(), resp.GetMessage())
-			}(wg)
+			}(n)
 		}
 		wg.Wait()
 		return nil
 	}
 
-	delEvent = func(ctx context.Context, s string, _ any) error {
+	kvstore.UpdateEvent = func(s string, a any) error {
 		wg := &sync.WaitGroup{}
 		for _, n := range nodes {
 			wg.Add(1)
-			go func(wg *sync.WaitGroup) {
+			go func(n proto.ServiceKVStoreClient) {
 				defer wg.Done()
+
+				ctx, cancel := context.WithTimeout(parentCtx, 2*time.Second)
+				defer cancel()
+
+				req := &proto.PutRequest{
+					Pairs: []*proto.KVPair{{Key: s, Val: fmt.Sprint(a)}},
+				}
+				resp, err := n.Update(ctx, req)
+				if err != nil {
+					fmt.Println("update event error", err)
+					return
+				}
+				fmt.Printf("UpdateEvent: Code:%d Message:%s\n", resp.GetCode(), resp.GetMessage())
+			}(n)
+		}
+		wg.Wait()
+		return nil
+	}
+
+	kvstore.RemoveEvent = func(s string, _ any) error {
+		wg := &sync.WaitGroup{}
+		for _, n := range nodes {
+			wg.Add(1)
+			go func(n proto.ServiceKVStoreClient) {
+				defer wg.Done()
+
+				ctx, cancel := context.WithTimeout(parentCtx, 2*time.Second)
+				defer cancel()
 
 				req := &proto.DeleteRequest{
 					Keys: []string{s},
 				}
 				resp, err := n.Delete(ctx, req)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println("delete event err", err)
 					return
 				}
 				fmt.Printf("DeleteEvent: Code:%d Message:%s\n", resp.GetCode(), resp.GetMessage())
-			}(wg)
+			}(n)
 		}
 		wg.Wait()
 		return nil
