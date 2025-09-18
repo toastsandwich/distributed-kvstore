@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package kvstore;
+option go_package = "pkg/proto";
+
+service ServiceKVStore {
+  rpc Ping(PingRequest) returns (Response); 
+  rpc Put(PutRequest) returns (Response);
+  rpc Delete(DeleteRequest) returns (Response);
+}
+
+message Response {
+  string message = 1;
+  int32 code = 2;
+}
+
+message PingRequest {
+  string name = 1;
+}
+
+message KVPair {
+  string key = 1;
+  string val = 2;
+}
+
+message PutRequest {
+  repeated KVPair pairs = 1;
+}
+
+message DeleteRequest {
+  repeated string keys = 1;
+}

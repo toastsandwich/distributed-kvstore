@@ -1,0 +1,8 @@
+name: kvstore-test-0
+host:
+  addr: localhost
+  port: 9000
+peers:
+  - http://localhost:9001/
+  # - http://localhost:9002/
+  # - http://localhost:9003/
