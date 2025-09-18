@@ -6,6 +6,7 @@ option go_package = "pkg/proto";
 service ServiceKVStore {
   rpc Ping(PingRequest) returns (Response); 
   rpc Put(PutRequest) returns (Response);
+  rpc Update(PutRequest) returns (Response);
   rpc Delete(DeleteRequest) returns (Response);
 }
 

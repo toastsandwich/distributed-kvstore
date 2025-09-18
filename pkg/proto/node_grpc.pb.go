@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	ServiceKVStore_Ping_FullMethodName   = "/kvstore.ServiceKVStore/Ping"
 	ServiceKVStore_Put_FullMethodName    = "/kvstore.ServiceKVStore/Put"
+	ServiceKVStore_Update_FullMethodName = "/kvstore.ServiceKVStore/Update"
 	ServiceKVStore_Delete_FullMethodName = "/kvstore.ServiceKVStore/Delete"
 )
 
@@ -30,6 +31,7 @@ const (
 type ServiceKVStoreClient interface {
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*Response, error)
 	Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*Response, error)
+	Update(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*Response, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Response, error)
 }
 
@@ -61,6 +63,16 @@ func (c *serviceKVStoreClient) Put(ctx context.Context, in *PutRequest, opts ...
 	return out, nil
 }
 
+func (c *serviceKVStoreClient) Update(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, ServiceKVStore_Update_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *serviceKVStoreClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
@@ -77,6 +89,7 @@ func (c *serviceKVStoreClient) Delete(ctx context.Context, in *DeleteRequest, op
 type ServiceKVStoreServer interface {
 	Ping(context.Context, *PingRequest) (*Response, error)
 	Put(context.Context, *PutRequest) (*Response, error)
+	Update(context.Context, *PutRequest) (*Response, error)
 	Delete(context.Context, *DeleteRequest) (*Response, error)
 	mustEmbedUnimplementedServiceKVStoreServer()
 }
@@ -93,6 +106,9 @@ func (UnimplementedServiceKVStoreServer) Ping(context.Context, *PingRequest) (*R
 }
 func (UnimplementedServiceKVStoreServer) Put(context.Context, *PutRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Put not implemented")
+}
+func (UnimplementedServiceKVStoreServer) Update(context.Context, *PutRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
 func (UnimplementedServiceKVStoreServer) Delete(context.Context, *DeleteRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
@@ -154,6 +170,24 @@ func _ServiceKVStore_Put_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServiceKVStore_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PutRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceKVStoreServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceKVStore_Update_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceKVStoreServer).Update(ctx, req.(*PutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ServiceKVStore_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteRequest)
 	if err := dec(in); err != nil {
@@ -186,6 +220,10 @@ var ServiceKVStore_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Put",
 			Handler:    _ServiceKVStore_Put_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _ServiceKVStore_Update_Handler,
 		},
 		{
 			MethodName: "Delete",

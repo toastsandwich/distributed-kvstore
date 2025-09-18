@@ -274,10 +274,11 @@ const file_proto_node_proto_rawDesc = "" +
 	"PutRequest\x12%\n" +
 	"\x05pairs\x18\x01 \x03(\v2\x0f.kvstore.KVPairR\x05pairs\"#\n" +
 	"\rDeleteRequest\x12\x12\n" +
-	"\x04keys\x18\x01 \x03(\tR\x04keys2\xa5\x01\n" +
+	"\x04keys\x18\x01 \x03(\tR\x04keys2\xd7\x01\n" +
 	"\x0eServiceKVStore\x12/\n" +
 	"\x04Ping\x12\x14.kvstore.PingRequest\x1a\x11.kvstore.Response\x12-\n" +
-	"\x03Put\x12\x13.kvstore.PutRequest\x1a\x11.kvstore.Response\x123\n" +
+	"\x03Put\x12\x13.kvstore.PutRequest\x1a\x11.kvstore.Response\x120\n" +
+	"\x06Update\x12\x13.kvstore.PutRequest\x1a\x11.kvstore.Response\x123\n" +
 	"\x06Delete\x12\x16.kvstore.DeleteRequest\x1a\x11.kvstore.ResponseB\vZ\tpkg/protob\x06proto3"
 
 var (
@@ -304,12 +305,14 @@ var file_proto_node_proto_depIdxs = []int32{
 	2, // 0: kvstore.PutRequest.pairs:type_name -> kvstore.KVPair
 	1, // 1: kvstore.ServiceKVStore.Ping:input_type -> kvstore.PingRequest
 	3, // 2: kvstore.ServiceKVStore.Put:input_type -> kvstore.PutRequest
-	4, // 3: kvstore.ServiceKVStore.Delete:input_type -> kvstore.DeleteRequest
-	0, // 4: kvstore.ServiceKVStore.Ping:output_type -> kvstore.Response
-	0, // 5: kvstore.ServiceKVStore.Put:output_type -> kvstore.Response
-	0, // 6: kvstore.ServiceKVStore.Delete:output_type -> kvstore.Response
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
+	3, // 3: kvstore.ServiceKVStore.Update:input_type -> kvstore.PutRequest
+	4, // 4: kvstore.ServiceKVStore.Delete:input_type -> kvstore.DeleteRequest
+	0, // 5: kvstore.ServiceKVStore.Ping:output_type -> kvstore.Response
+	0, // 6: kvstore.ServiceKVStore.Put:output_type -> kvstore.Response
+	0, // 7: kvstore.ServiceKVStore.Update:output_type -> kvstore.Response
+	0, // 8: kvstore.ServiceKVStore.Delete:output_type -> kvstore.Response
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
