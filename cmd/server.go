@@ -10,16 +10,16 @@ import (
 
 var configPath string
 
-var ServerCmd = cobra.Command{
+var ServerCmd = &cobra.Command{
 	Use:     "start",
 	Short:   "start server with provided config",
 	Long:    "use start command to start a server, it requires a configuration which must be provided by -C flag",
 	Example: "kvstore start -C ~/kvstore/config.yaml",
 
-	RunE: run,
+	RunE: runServer,
 }
 
-func run(cmd *cobra.Command, args []string) error {
+func runServer(cmd *cobra.Command, args []string) error {
 	if configPath == "" {
 		return fmt.Errorf("config path cannot be empty")
 	}

@@ -18,7 +18,8 @@ func init() {
 }
 
 func Main() {
-	App.AddCommand(&ServerCmd)
+	App.AddCommand(ServerCmd)
+	App.AddCommand(CertGenCmd)
 	if err := App.Execute(); err != nil {
 		os.Exit(1)
 	}

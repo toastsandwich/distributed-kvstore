@@ -18,9 +18,8 @@ func (s *Server) startHTTPServer(app *fiber.App) {
 
 	signal.Notify(sigCh, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		if err := app.Listen(net.JoinHostPort(s.cfg.Host.Addr, s.cfg.Host.Port)); err != nil {
-			fmt.Println(err.Error())
-			return
+		if err := app.ListenTLS(net.JoinHostPort(s.cfg.Host.Addr, s.cfg.Host.Port), s.cfg.TLS.Cert, s.cfg.TLS.Key); err != nil {
+			fmt.Println(err)
 		}
 	}()
 	<-sigCh

@@ -13,7 +13,13 @@ type Config struct {
 	} `yaml:"host"`
 	Name string   `yaml:"name"`
 	Peer []string `yaml:"peers"`
-	Dir  string   `yaml:"dir"`
+
+	TLS struct {
+		Cert string `yaml:"cert"`
+		Key  string `yaml:"key"`
+	} `yaml:"tls"`
+
+	Dir string `yaml:"dir"`
 }
 
 func ReadFrom(path string) (Config, error) {
