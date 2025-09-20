@@ -7,7 +7,7 @@ import (
 
 var (
 	hosts []string
-	ip    string
+	ip    []string
 )
 
 var CertGenCmd = &cobra.Command{
@@ -23,6 +23,6 @@ func runCertgen(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
-	CertGenCmd.Flags().StringVarP(&ip, "ip", "", "", "use this to set ip for certificate")
+	CertGenCmd.Flags().StringSliceVar(&ip, "ip", nil, "use this to set ip for certificate")
 	CertGenCmd.Flags().StringSliceVar(&hosts, "hosts", nil, "use this to set hosts for certificate")
 }

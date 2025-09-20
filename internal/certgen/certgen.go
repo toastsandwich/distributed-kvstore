@@ -12,14 +12,19 @@ import (
 	"time"
 )
 
-func Generate(ip string, dns []string) error {
-	if ip == "" {
-		return fmt.Errorf("ip cannot be empty")
-	}
-
+func Generate(ip []string, dns []string) error {
 	pubKey, pvtKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return err
+	}
+
+	nip := []net.IP{}
+	for i := range ip {
+		p := net.ParseIP(ip[i])
+		if p == nil {
+			return fmt.Errorf("invalid ip")
+		}
+		nip = append(nip, p)
 	}
 
 	cert := &x509.Certificate{
@@ -29,7 +34,7 @@ func Generate(ip string, dns []string) error {
 		PublicKeyAlgorithm: x509.Ed25519,
 
 		DNSNames:    dns,
-		IPAddresses: []net.IP{net.IP(ip)},
+		IPAddresses: nip,
 
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().Add(36 * time.Hour),
